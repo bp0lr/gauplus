@@ -1,0 +1,168 @@
+package main
+
+import (
+	"bufio"
+	"crypto/tls"
+	"flag"
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/bp0lr/gauplus/output"
+	"github.com/bp0lr/gauplus/providers"
+)
+
+func run(config *providers.Config, domains []string) {
+
+	var providerList []providers.Provider
+	for _, toUse := range config.Providers {
+		switch toUse {
+		case "wayback":
+			wayback := providers.NewWaybackProvider(config)
+			providerList = append(providerList, wayback)
+		case "otx":
+			otx := providers.NewOTXProvider(config)
+			providerList = append(providerList, otx)
+		case "commoncrawl":
+			common, err := providers.NewCommonProvider(config)
+			if err == nil {
+				providerList = append(providerList, common)
+			}
+		default:
+			fmt.Fprintf(os.Stderr, "Error: %s is not a valid provider.\n", toUse)
+		}
+	}
+
+	results := make(chan string)
+	var out io.Writer
+	// Handle results in background
+	if config.Output == "" {
+		out = os.Stdout
+	} else {
+		ofp, err := os.OpenFile(config.Output, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatalf("Could not open output file: %v\n", err)
+		}
+		defer ofp.Close()
+		out = ofp
+	}
+
+	writewg := &sync.WaitGroup{}
+	writewg.Add(1)
+	if config.JSON {
+		go func() {
+			output.WriteURLsJSON(results, out)
+			writewg.Done()
+		}()
+	} else {
+		go func() {
+			output.WriteURLs(results, out)
+			writewg.Done()
+		}()
+	}
+	exitStatus := 0
+
+	var i = 0
+	wg := &sync.WaitGroup{}
+	for _, domain := range domains {
+
+		if config.Verbose {
+			fmt.Printf("[+] Working on: %v\n", domain)
+		}
+		domain := domain
+		wg.Add(len(providerList))
+		i++
+		for _, provider := range providerList {
+			go func(provider providers.Provider) {
+				defer wg.Done()
+				if err := provider.Fetch(domain, results); err != nil {
+					if config.Verbose {
+						_, _ = fmt.Fprintln(os.Stderr, err)
+					}
+				}
+			}(provider)
+		}
+
+		if i >= config.MaxThreads {
+			i = 0
+			wg.Wait()
+		}
+	}
+
+	wg.Wait()
+	close(results)
+
+	// Wait for writer to finish
+	writewg.Wait()
+	os.Exit(exitStatus)
+}
+
+func main() {
+	var domains []string
+	verbose := flag.Bool("v", false, "enable verbose mode")
+	includeSubs := flag.Bool("subs", false, "include subdomains of target domain")
+	maxRetries := flag.Uint("retries", 5, "amount of retries for http client")
+	useProviders := flag.String("providers", "wayback,otx,commoncrawl", "providers to fetch urls for")
+	version := flag.Bool("version", false, "show gau version")
+	proxy := flag.String("p", "", "use proxy")
+	output := flag.String("o", "", "filename to write results to")
+	jsonOut := flag.Bool("json", false, "write output as json")
+	randomAgent := flag.Bool("random-agent", false, "use random user-agent")
+	maxThreads := flag.Int("t", 5, "amount of parallel workers")
+	flag.Parse()
+
+	if *version {
+		fmt.Printf("gau version: %s\n", providers.Version)
+		os.Exit(0)
+	}
+
+	if *maxThreads > 100 {
+		*maxThreads = 100
+	}
+
+	if flag.NArg() > 0 {
+		domains = flag.Args()
+	} else {
+		s := bufio.NewScanner(os.Stdin)
+		for s.Scan() {
+			domains = append(domains, s.Text())
+		}
+	}
+
+	tr := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout: 5 * time.Second,
+		}).DialContext,
+		TLSHandshakeTimeout: 5 * time.Second,
+		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+	}
+
+	if *proxy != "" {
+		if p, err := url.Parse(*proxy); err == nil {
+			tr.Proxy = http.ProxyURL(p)
+		}
+	}
+
+	config := providers.Config{
+		Verbose:           *verbose,
+		MaxThreads:        *maxThreads,
+		RandomAgent:       *randomAgent,
+		MaxRetries:        *maxRetries,
+		IncludeSubdomains: *includeSubs,
+		Output:            *output,
+		JSON:              *jsonOut,
+		Client: &http.Client{
+			Timeout:   time.Second * 15,
+			Transport: tr,
+		},
+		Providers: strings.Split(*useProviders, ","),
+	}
+	run(&config, domains)
+}
