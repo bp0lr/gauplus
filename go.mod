@@ -1,8 +1,5 @@
-module github.com/lc/gau
+module github.com/bp0lr/gauplus
 
-go 1.14
+go 1.15
 
-require (
-	github.com/bp0lr/gauplus v0.0.0-20201008200520-6668650e753f // indirect
-	github.com/json-iterator/go v1.1.10
-)
+require github.com/json-iterator/go v1.1.10
