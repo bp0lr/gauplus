@@ -1,4 +1,5 @@
 github.com/bp0lr/gauplus v0.0.0-20201008200520-6668650e753f h1:TmSU88EjkMUc1NqW8Xp1vr0yPfirz2pLjTMehSkUs8o=
+github.com/bp0lr/gauplus v0.0.0-20201008200520-6668650e753f/go.mod h1:rJBifePC30jHeRz8l7wrbtPcUnGOPt90wdBOa+v0Swk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
