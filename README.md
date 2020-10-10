@@ -18,7 +18,7 @@ $ echo "example.com" | gauplus -p "http://proxy.packetstream.io:31112" --random-
 To display the help for the tool use the `-h` flag:
 
 ```bash
-$ gau -h
+$ gauplus -h
 
  -json
         write output as json
@@ -38,7 +38,7 @@ $ gau -h
         amount of parallel workers (default 5)
   -v    enable verbose mode
   -version
-        show gau version
+        show gauplus version
 
 ```
 
