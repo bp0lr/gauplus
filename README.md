@@ -38,7 +38,7 @@ $ gauplus -h
         amount of parallel workers (default 5)
   -v    enable verbose mode
   -version
-        show gau version
+        show gauplus version
 
 ```
 
