@@ -13,6 +13,7 @@ $ cat domains.txt | gauplus
 $ gauplus example.com
 $ gauplus -o example-urls.txt example.com
 $ echo "example.com" | gauplus -p "http://proxy.packetstream.io:31112" --random-agent -o result.txt -t 25
+$ gauplus -b png,jpg,gif example.com
 ```
 
 To display the help for the tool use the `-h` flag:
@@ -39,7 +40,8 @@ $ gauplus -h
   -v    enable verbose mode
   -version
         show gauplus version
-
+  -b
+        extensions to skip
 ```
 
 ### comparison

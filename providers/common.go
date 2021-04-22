@@ -33,7 +33,7 @@ func NewCommonProvider(config *Config) (Provider, error) {
 	resp, err := c.MakeRequest("http://index.commoncrawl.org/collinfo.json")
 	if err != nil {
 		if c.Config.Verbose {
-			fmt.Printf("[-] common error1: %s\n", err)
+			fmt.Printf("[-] Error on request collinfo.json: %s\n", err)
 		}
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func NewCommonProvider(config *Config) (Provider, error) {
 	var apiResult CommonAPIResult
 	if err = json.NewDecoder(resp.Body).Decode(&apiResult); err != nil {
 		if c.Config.Verbose {
-			fmt.Printf("[-] common error2: %s\n", err)
+			fmt.Printf("[-] Eror on response collinfo.json: %s\n", err)
 		}
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *CommonProvider) getPagination(domain string) (*CommonPaginationResult, 
 	resp, err := c.MakeRequest(url)
 	if err != nil {
 		if c.Config.Verbose {
-			fmt.Printf("[-] common error3: %s\n", err)
+			fmt.Printf("[-] Error request pagination: %s\n", err)
 		}
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *CommonProvider) getPagination(domain string) (*CommonPaginationResult, 
 	var paginationResult CommonPaginationResult
 	if err = json.NewDecoder(resp.Body).Decode(&paginationResult); err != nil {
 		if c.Config.Verbose {
-			fmt.Printf("[-] common error4: %s\n", err)
+			fmt.Printf("[-] Error response pagination: %s\n", err)
 		}
 		return nil, err
 	}

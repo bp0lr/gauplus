@@ -1,8 +1,8 @@
 package providers
 
 import (
-	"net/http"
 	"math/rand"
+	"net/http"
 	"time"
 )
 
@@ -10,7 +10,7 @@ const (
 	// Version of gau
 	Version = `1.1.0`
 	// UserAgent for the HTTP Client
-	userAgent = "Mozilla/5.0 (compatible; gau/" + Version + "; https://github.com/lc/gau)"
+	userAgent = "Mozilla/5.0 (compatible; gauplus/" + Version + "; https://github.com/bp0lr/gauplus)"
 )
 
 // A generic interface for providers
@@ -25,6 +25,7 @@ type Config struct {
 	IncludeSubdomains bool
 	Client            *http.Client
 	Providers         []string
+	Blacklist 		  map[string]struct{}
 	Output            string
 	JSON              bool
 }

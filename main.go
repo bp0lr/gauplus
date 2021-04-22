@@ -58,12 +58,12 @@ func run(config *providers.Config, domains []string) {
 	writewg.Add(1)
 	if config.JSON {
 		go func() {
-			output.WriteURLsJSON(results, out)
+			output.WriteURLsJSON(results, out, config.Blacklist)
 			writewg.Done()
 		}()
 	} else {
 		go func() {
-			output.WriteURLs(results, out)
+			output.WriteURLs(results, out, config.Blacklist)
 			writewg.Done()
 		}()
 	}
@@ -111,11 +111,12 @@ func main() {
 	maxRetries := flag.Uint("retries", 5, "amount of retries for http client")
 	useProviders := flag.String("providers", "wayback,otx,commoncrawl", "providers to fetch urls for")
 	version := flag.Bool("version", false, "show gau version")
-	proxy := flag.String("p", "", "use proxy")
+	proxy := flag.String("p", "", "HTTP proxy to use")
 	output := flag.String("o", "", "filename to write results to")
 	jsonOut := flag.Bool("json", false, "write output as json")
 	randomAgent := flag.Bool("random-agent", false, "use random user-agent")
 	maxThreads := flag.Int("t", 5, "amount of parallel workers")
+	blacklist := flag.String("b","","extensions to skip, ex: ttf,woff,svg,png,jpg")
 	flag.Parse()
 
 	if *version {
@@ -150,6 +151,13 @@ func main() {
 		}
 	}
 
+	extensions := strings.Split(*blacklist,",")
+	extMap := make(map[string]struct{})
+	for _, ext := range extensions {
+		ext = strings.Replace(ext, ".", "", -1)
+		extMap[strings.ToLower(ext)] = struct{}{}
+	}
+
 	config := providers.Config{
 		Verbose:           *verbose,
 		MaxThreads:        *maxThreads,
@@ -158,6 +166,7 @@ func main() {
 		IncludeSubdomains: *includeSubs,
 		Output:            *output,
 		JSON:              *jsonOut,
+		Blacklist: 			extMap,
 		Client: &http.Client{
 			Timeout:   time.Second * 15,
 			Transport: tr,
