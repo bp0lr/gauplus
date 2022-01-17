@@ -40,6 +40,11 @@ func run(config *providers.Config, domains []string) {
 		}
 	}
 
+	if(len(providerList) == 0){
+		fmt.Fprintf(os.Stderr, "Error: All our providers are currently down.\nPlease try again later.\n")
+		return;
+	}
+
 	results := make(chan string)
 	var out io.Writer
 	// Handle results in background

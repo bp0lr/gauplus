@@ -3,6 +3,7 @@ package providers
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -40,11 +41,13 @@ func NewCommonProvider(config *Config) (Provider, error) {
 
 	defer resp.Body.Close()
 
-	var apiResult CommonAPIResult
-	if err = json.NewDecoder(resp.Body).Decode(&apiResult); err != nil {
+	var apiResult CommonAPIResult;
+	err = json.NewDecoder(resp.Body).Decode(&apiResult);
+	if  err != nil || len(apiResult) < 1{
 		if c.Config.Verbose {
-			fmt.Printf("[-] Eror on response collinfo.json: %s\n", err)
+			fmt.Printf("[-] Erorr on response collinfo.json: %s\n", err)
 		}
+		err = errors.New("[-] Commoncrawl, erorr on response collinfo.json.")
 		return nil, err
 	}
 
