@@ -63,7 +63,7 @@ sys     0m0.408s
 ## Installation:
 ### From source:
 ```
-$ GO111MODULE=on go get -u -v github.com/bp0lr/gauplus
+$ go install github.com/bp0lr/gauplus@latest
 ```
 
 ## Useful?, buy lc some coffe!
