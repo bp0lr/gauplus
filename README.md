@@ -1,7 +1,7 @@
 
 # GauPlus
 
-A modified version of (http://wwww.github.com/lc/gau) for personal usage.
+A modified version of (http://www.github.com/lc/gau) for personal usage.
 Support workers, proxies and some extra things.
 
 ## Usage:
