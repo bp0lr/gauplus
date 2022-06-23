@@ -15,6 +15,12 @@ $ gauplus -o example-urls.txt example.com
 $ echo "example.com" | gauplus -p "http://proxy.packetstream.io:31112" --random-agent -o result.txt -t 25
 $ gauplus -b png,jpg,gif example.com
 ```
+## Run Docker:
+Examples:
+```bash
+$ docker bulid -t gauplus . 
+$ docker run -t gauplus -h
+```
 
 To display the help for the tool use the `-h` flag:
 
