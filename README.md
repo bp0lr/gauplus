@@ -1,4 +1,25 @@
 
+# Discontinued
+
+[lc](https://github.com/lc) has made a great job updating gau adding everything that gauplus have and more.
+please use his version, is far more advanced that this one.
+
+visit here: (http://www.github.com/lc/gau)
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------
+# Discontinued
+---------------------------------------------------------------------
+
+
+
 # GauPlus
 
 A modified version of (http://www.github.com/lc/gau) for personal usage.
